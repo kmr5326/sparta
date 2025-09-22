@@ -1,29 +1,31 @@
 plugins {
 	id 'java'
-	id 'war'
+	// id 'war'  // ← JAR만 쓸 거면 사용 안 함
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.sparta'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+	toolchain { languageVersion = JavaLanguageVersion.of(17) }
 }
+
+springBoot {
+	mainClass = 'com.sparta.myselectshop.MyselectshopApplication'
+}
+
+/* ⬇️ war을 안 쓰므로 bootWar 블록은 아예 제거! */
+// bootWar { enabled = false }   // ← 삭제
+bootJar { enabled = true }      // (기본값이지만 명시 OK)
+jar { enabled = false }         // plain.jar 만들지 않으려면 유지
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+	compileOnly { extendsFrom annotationProcessor }
 }
 
-repositories {
-	mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -32,23 +34,27 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// JWT
-	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+	compileOnly 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-// json
+	// JSON
 	implementation 'org.json:json:20230227'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
+/* ⛔️ 제거: WAR 프로젝트 전용 설정
+providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+*/
+
+tasks.named('test') { useJUnitPlatform() }
